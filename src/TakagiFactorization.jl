@@ -38,16 +38,6 @@ function takagi_factor!(
     nsweeps = 0
     while !done && (nsweeps += 1) ≤ maxsweeps
 
-        println("A =")
-        display(A)
-        println()
-        println("U =")
-        display(U)
-        println()
-        println("ev =")
-        display(ev)
-        println()
-
         off = sum(abs2(A[p,q]) for q in 2:n for p in 1:q-1)
         if off ≤ sym_eps(T)
             done = true
@@ -58,7 +48,6 @@ function takagi_factor!(
 
         for q in 2:n
             for p in 1:q-1
-                @show (p,q)
                 off = abs2(A[p,q])
                 sqp = abs2(ev[2,p])
                 sqq = abs2(ev[2,q])
@@ -105,22 +94,12 @@ function takagi_factor!(
 
                     A[p,q] = zero(T)
 
-                    println("Before")
-                    println("U =")
-                    display(U)
-                    println()
-
                     for j in 1:n
                         x = U[p,j]
                         y = U[q,j]
                         U[p,j] = x + (f*y - t*x)
                         U[q,j] = y - (f'*x + t*y)
                     end
-
-                    println("After")
-                    println("U =")
-                    display(U)
-                    println()
                 end # elseif off > thresh
             end # for p in 1:q
         end # for q in 2:n
