@@ -20,12 +20,11 @@ function takagi_factor!(
     if size(d, 1) ≠ n
         throw(ValueError("d must have length n for a n×n matrix A"))
     end
-    red = T(0.04) / n^4
-    ev = zeros(Complex{T}, n, 2)
+    ev = zeros(Complex{T}, 2, n)
 
     for p in 1:n
-        ev[p,1] = zero(T)
-        ev[p,2] = A[p,p]
+        ev[1,p] = zero(T)
+        ev[2,p] = A[p,p]
     end
 
     fill!(U, zero(T))
@@ -33,57 +32,71 @@ function takagi_factor!(
         U[p,p] = one(T)
     end
 
+    red = T(0.04) / n^4
+
     done = false
     nsweeps = 0
     while !done && (nsweeps += 1) ≤ maxsweeps
-        thresh = sum(abs2(A[p,q]) for q in 2:n for p in 1:q)
-        if thresh ≤ sym_eps(T)
+
+        println("A =")
+        display(A)
+        println()
+        println("U =")
+        display(U)
+        println()
+        println("ev =")
+        display(ev)
+        println()
+
+        off = sum(abs2(A[p,q]) for q in 2:n for p in 1:q-1)
+        if off ≤ sym_eps(T)
             done = true
             continue
         end
 
-        thresh = (nsweeps < 4) ? thresh*red : zero(T)
+        thresh = (nsweeps < 4) ? off*red : zero(T)
 
         for q in 2:n
-            for p in 1:q
+            for p in 1:q-1
+                @show (p,q)
                 off = abs2(A[p,q])
-                sqp = abs2(ev[p,2])
-                sqq = abs2(ev[q,2])
+                sqp = abs2(ev[2,p])
+                sqq = abs2(ev[2,q])
                 if nsweeps > 4 && off < sym_eps(T)*(sqp+sqq)
                     A[p,q] = zero(T)
                 elseif off > thresh
                     t = abs(sqp-sqq) / 2
                     f = if t > eps(T)
-                        sign(sqp-sqq) * (ev[q,2]*A[p,q]' + ev[p,2]'*A[p,q])
+                        sign(sqp-sqq) * (ev[2,q]*A[p,q]' + ev[2,p]'*A[p,q])
                     else
-                        (sqp == 0) ? one(T) : √(ev[q,2]/ev[p,2])
+                        (sqp == 0) ? one(T) : √(ev[2,q]/ev[2,p])
                     end
                     t += √(t^2 + abs2(f))
                     f /= t
 
-                    ev[p,2] = A[p,p] + (ev[p,1] += A[p,q]*f')
-                    ev[q,2] = A[q,q] + (ev[q,1] -= A[p,q]*f )
+                    ev[2,p] = A[p,p] + (ev[1,p] += A[p,q]*f')
+                    ev[2,q] = A[q,q] + (ev[1,q] -= A[p,q]*f )
 
                     t = abs2(f)
                     c⁻¹ = √(t + 1)
                     f /= c⁻¹
                     t /= c⁻¹*(c⁻¹+1)
 
-                    for j in 1:p
+                    for j in 1:p-1
                         x = A[j,p]
                         y = A[j,q]
                         A[j,p] = x + (f'*y - t*x)
                         A[j,q] = y - (f*x + t*y)
                     end
 
-                    for j in p+2:q
+                    for j in p+1:q-1
                         x = A[p,j]
                         y = A[j,q]
                         A[p,j] = x + (f'*y - t*x)
                         A[j,q] = y - (f*x + t*y)
                     end
 
-                    for j in q+2:n
+                    for j in q+1:n
                         x = A[p,j]
                         y = A[q,j]
                         A[p,j] = x + (f'*y - t*x)
@@ -92,58 +105,69 @@ function takagi_factor!(
 
                     A[p,q] = zero(T)
 
+                    println("Before")
+                    println("U =")
+                    display(U)
+                    println()
+
                     for j in 1:n
-                        x = U[j,p]
-                        y = U[j,q]
-                        U[j,p] = x + (f*y - t*x)
-                        U[j,q] = y - (f'*x + t*y)
+                        x = U[p,j]
+                        y = U[q,j]
+                        U[p,j] = x + (f*y - t*x)
+                        U[q,j] = y - (f'*x + t*y)
                     end
+
+                    println("After")
+                    println("U =")
+                    display(U)
+                    println()
                 end # elseif off > thresh
             end # for p in 1:q
         end # for q in 2:n
 
         for p in 1:n
-            ev[p,1] = zero(T)
-            A[p,p] = ev[p,2]
+            ev[1,p] = zero(T)
+            A[p,p] = ev[2,p]
         end
     end # for nsweeps in 1:maxsweeps
 
     if !done
         @warn "Bad convergence in takagi_factor!"
     else
+        # Make the diagonal elements non-negative
         for p in 1:n
             # d[p] = abs(A[p,p])
             # if d[p] > eps(T) && d[p] ≠ real(A[p,p])
             #     U[:,p] .*= √(A[p,p]/d[p])
             # end
-            App = A[p,p]
-            d[p] = abs(App)
-            if d[p] > eps(T) && d[p] ≠ real(App)
-                f = √(App/d[p])
+            d[p] = abs(A[p,p])
+            if d[p] > eps(T) && d[p] ≠ real(A[p,p])
+                f = √(A[p,p]/d[p])
                 for q in 1:n
-                    U[q,p] *= f
+                    U[p,q] *= f
                 end
             end
         end
 
         if sort ≠ 0
+            # Sort the eigenvalues
             for p in 1:n-1
                 j = p
                 t = d[p]
-                for q in p+2:n
+                for q in p+1:n
                     if sort*(t-d[q]) > 0
                         t = d[j=q]
                     end
-                    if j == p
-                        continue
-                    end
-                    d[j] = d[p]
-                    d[p] = t
-                    for q in 1:n
-                        x = U[q,p]
-                        U[q,p] = U[q,j]
-                        U[q,j] = x
-                    end
+
+                    if j ≠ p
+                        d[j] = d[p]
+                        d[p] = t
+                        for q in 1:n
+                            x = U[p,q]
+                            U[p,q] = U[j,q]
+                            U[j,q] = x
+                        end
+                    end # if j ≠ p
                 end # for q in p+2:n
             end # for p in 1:n-1
         end # if sort ≠ 0
