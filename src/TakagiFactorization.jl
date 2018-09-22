@@ -2,7 +2,9 @@ module TakagiFactorization
 
 using LinearAlgebra
 
-export takagi_factor!, takagi_factor
+import Base.showerror
+
+export takagi_factor!, takagi_factor, ConvergenceError
 
 function takagi_factor(
     A :: AbstractArray{Complex{T}, 2};
@@ -18,6 +20,12 @@ function takagi_factor(
     takagi_factor!(copy(A), d, U; sort=sort, maxsweeps=maxsweeps)
     Diagonal(d), U
 end
+
+struct ConvergenceError <: Exception
+    msg :: String
+end
+
+Base.showerror(io::IO, e::ConvergenceError) = print(io, e.msg)
 
 function takagi_factor!(
     A :: AbstractArray{Complex{T}, 2},
@@ -131,7 +139,7 @@ function takagi_factor!(
     end # for nsweeps in 1:maxsweeps
 
     if !done
-        @warn "Bad convergence in takagi_factor!"
+        throw(ConvergenceError("Bad convergence in takagi_factor!"))
     else
         # Make the diagonal elements non-negative
         for p in 1:n

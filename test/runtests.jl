@@ -72,6 +72,8 @@ const N_RANDOM_TESTS=100
         @test_throws ArgumentError takagi_factor!(A₃, d₃_bad , U₃_good)
         A₄ = fill(1.0+1.0im, 1, 1)
         @test_throws ArgumentError takagi_factor(A₄)
+        A₅ = [1.0(i+j)+(i+j)^2*im for i in 1:3, j in 1:3]
+        @test_throws ConvergenceError takagi_factor(A₅, maxsweeps=3)
     end
     @testset "3×3 matrix" begin
         A₃ = [1.0(i+j)+(i+j)^2*im for i in 1:3, j in 1:3]
