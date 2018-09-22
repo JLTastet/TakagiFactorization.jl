@@ -67,8 +67,9 @@ const N_RANDOM_TESTS=100
         U₃_bad  = zeros(Complex{Float64}, 2, 3)
         d₃_good = zeros(Float64, 2)
         d₃_bad  = zeros(Float64, 3)
-        @test_throws ArgumentError takagi_factor!(A₃, d₃_good, U₃_bad)
-        @test_throws ArgumentError takagi_factor!(A₃, d₃_bad, U₃_good)
+        @test_throws ArgumentError takagi_factor!(A₂, d₃_good, U₃_good)
+        @test_throws ArgumentError takagi_factor!(A₃, d₃_good, U₃_bad )
+        @test_throws ArgumentError takagi_factor!(A₃, d₃_bad , U₃_good)
         A₄ = fill(1.0+1.0im, 1, 1)
         @test_throws ArgumentError takagi_factor(A₄)
     end
