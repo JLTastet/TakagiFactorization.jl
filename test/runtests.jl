@@ -53,4 +53,8 @@ using Test
             @test U₂ ≈ [1 1; -1im 1im] / √2 atol=2eps(Float64)*sum(abs.(U₂))
         end
     end
+    @testset "Exceptions" begin
+        A₁ = convert(Matrix{Complex{Float64}}, [1 2; 3 4])
+        @test_throws ArgumentError takagi_factor(A₁)
+    end
 end

@@ -7,8 +7,12 @@ export takagi_factor!, takagi_factor
 function takagi_factor(
     A :: AbstractArray{Complex{T}, 2};
     sort = 0,
-    maxsweeps = 50
+    maxsweeps = 50,
+    enforce_symmetric = true
 ) where {T <: AbstractFloat}
+    if enforce_symmetric && !issymmetric(A)
+        throw(ArgumentError("A must be a symmetric complex matrix"))
+    end
     U = zeros(Complex{T}, size(A))
     d = zeros(T, size(A, 1))
     takagi_factor!(copy(A), d, U; sort=sort, maxsweeps=maxsweeps)
