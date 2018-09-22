@@ -148,7 +148,8 @@ function takagi_factor!(
                 t = d[p]
                 for q in p+1:n
                     if sort*(t-d[q]) > 0
-                        t = d[j=q]
+                        j = q
+                        t = d[q]
                     end
 
                     if j ≠ p
