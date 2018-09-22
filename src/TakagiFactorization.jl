@@ -12,6 +12,7 @@ function takagi_factor(
     U = zeros(Complex{T}, size(A))
     d = zeros(T, size(A, 1))
     takagi_factor!(copy(A), d, U; sort=sort, maxsweeps=maxsweeps)
+    Diagonal(d), U
 end
 
 function takagi_factor!(
@@ -163,7 +164,6 @@ function takagi_factor!(
             end # for p in 1:n-1
         end # if sort ≠ 0
     end
-    Diagonal(d), U
 end
 
 sq_eps(x)  = 4*eps(x)^2
