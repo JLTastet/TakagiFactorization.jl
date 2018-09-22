@@ -66,4 +66,19 @@ using Test
         @test_throws ArgumentError takagi_factor!(A₃, d₃_good, U₃_bad)
         @test_throws ArgumentError takagi_factor!(A₃, d₃_bad, U₃_good)
     end
+    @testset "3×3 matrix" begin
+        A₃ = [1.0(i+j)+(i+j)^2*im for i in 1:3, j in 1:3]
+        d₃, U₃ = takagi_factor(A₃)
+        @test A₃ ≈ transpose(U₃) * d₃ * U₃
+        @test d₃ ≈ Diagonal([
+            4.4155861739535916e-2,
+            3.0033913500521656,
+            60.323939614868543
+        ]) atol=eps(Float64)*sum(d₃)
+        @test U₃ ≈ [
+            +0.33545335144108862+0.40821295749675734im -0.47239985226318137-0.63226478108905759im +0.17953534721318656+0.25628093104221283im;
+            +0.52042491538817959-0.58868255009056192im +0.21692804802171137-0.22840328588677278im -0.38789586814856813+0.36458431002027947im;
+            +0.26495953910168601+0.18231959751983218im +0.41505791673853226+0.32493185886646364im +0.59888076930548662+0.50994513822719334im
+        ] atol=3eps(Float64)*sum(abs.(U₃))
+    end
 end
