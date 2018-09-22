@@ -37,6 +37,9 @@ function takagi_factor!(
     if size(d, 1) ≠ n
         throw(ArgumentError("d must have length n for a n×n matrix A"))
     end
+    if n < 2
+        throw(ArgumentError("A must be at least 2×2"))
+    end
     ev = zeros(Complex{T}, 2, n)
 
     for p in 1:n
