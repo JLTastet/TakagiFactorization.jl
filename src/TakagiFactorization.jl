@@ -29,13 +29,13 @@ function takagi_factor!(
 
     n = size(A, 1)
     if size(A, 2) ≠ n
-        throw(ValueError("A must be a square matrix"))
+        throw(ArgumentError("A must be a square matrix"))
     end
     if size(U) ≠ size(A)
-        throw(ValueError("U must be a square matrix with the same dimensions as A"))
+        throw(ArgumentError("U must be a square matrix with the same dimensions as A"))
     end
     if size(d, 1) ≠ n
-        throw(ValueError("d must have length n for a n×n matrix A"))
+        throw(ArgumentError("d must have length n for a n×n matrix A"))
     end
     ev = zeros(Complex{T}, 2, n)
 

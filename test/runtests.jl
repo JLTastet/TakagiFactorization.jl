@@ -56,5 +56,14 @@ using Test
     @testset "Exceptions" begin
         A₁ = convert(Matrix{Complex{Float64}}, [1 2; 3 4])
         @test_throws ArgumentError takagi_factor(A₁)
+        A₂ = convert(Matrix{Complex{Float64}}, [1 2 3; 3 5 6])
+        @test_throws ArgumentError takagi_factor(A₂)
+        A₃ = convert(Matrix{Complex{Float64}}, [1 2; 2 1])
+        U₃_good = zeros(Complex{Float64}, 2, 2)
+        U₃_bad  = zeros(Complex{Float64}, 2, 3)
+        d₃_good = zeros(Float64, 2)
+        d₃_bad  = zeros(Float64, 3)
+        @test_throws ArgumentError takagi_factor!(A₃, d₃_good, U₃_bad)
+        @test_throws ArgumentError takagi_factor!(A₃, d₃_bad, U₃_good)
     end
 end
