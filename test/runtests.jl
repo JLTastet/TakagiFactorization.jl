@@ -1,6 +1,10 @@
 using TakagiFactorization
 using LinearAlgebra
 using Test
+using Random
+using DoubleFloats
+
+const N_RANDOM_TESTS=100
 
 @testset "Takagi" begin
     @testset "Examples" begin
@@ -82,5 +86,20 @@ using Test
             +0.52042491538817959-0.58868255009056192im +0.21692804802171137-0.22840328588677278im -0.38789586814856813+0.36458431002027947im;
             +0.26495953910168601+0.18231959751983218im +0.41505791673853226+0.32493185886646364im +0.59888076930548662+0.50994513822719334im
         ] atol=3eps(Float64)*sum(abs.(U₃))
+    end
+    @testset "Random" begin
+        symmetrize(A) = (A + transpose(A)) / 2
+        Random.seed!(24363)
+        for T in [Float32, Float64, BigFloat, Double32, Double64]
+            for N = 2:16
+                for k in 1:N_RANDOM_TESTS
+                    for sort in -1:+1
+                        A = symmetrize(rand(Complex{T}, N, N))
+                        d, U = takagi_factor(A)
+                        @test A ≈ transpose(U) * d * U atol=10*√(30*N^3)*eps(T)*sum(abs.(A)) # 10σ should be enough…
+                    end
+                end
+            end
+        end
     end
 end
