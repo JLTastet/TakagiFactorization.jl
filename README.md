@@ -1,7 +1,7 @@
 # TakagiFactorization.jl
 
-[![Build Status](https://travis-ci.org/Element-126/TakagiFactorization.jl.svg?branch=master)](https://travis-ci.org/Element-126/TakagiFactorization.jl)
-[![codecov.io](http://codecov.io/github/Element-126/TakagiFactorization.jl/coverage.svg?branch=master)](http://codecov.io/github/Element-126/TakagiFactorization.jl?branch=master)
+[![Build Status](https://travis-ci.org/JLTastet/TakagiFactorization.jl.svg?branch=master)](https://travis-ci.org/JLTastet/TakagiFactorization.jl)
+[![codecov.io](http://codecov.io/github/JLTastet/TakagiFactorization.jl/coverage.svg?branch=master)](http://codecov.io/github/JLTastet/TakagiFactorization.jl?branch=master)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 
 This package is a Julia translation of Thomas Hahn's Takagi factorization routine (http://www.feynarts.de/diag/).
